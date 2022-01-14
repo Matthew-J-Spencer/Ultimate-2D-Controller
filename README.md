@@ -6,4 +6,4 @@ Watch the video: https://www.youtube.com/watch?v=3sWTzMsmdx8 <br>
 Play the game: https://tarodev.itch.io/ultimate-2d-controller
 
 
-## Leave a ⭐ if you found it helpful!
+### Leave a ⭐ if you found it helpful!
