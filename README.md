@@ -7,3 +7,6 @@ Play the game: https://tarodev.itch.io/ultimate-2d-controller
 
 
 ### Leave a ⭐ if you found it helpful!
+
+
+Feel free to use the code in your production games. Attribution welcomed :)
