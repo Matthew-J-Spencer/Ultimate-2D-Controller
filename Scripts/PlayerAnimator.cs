@@ -19,15 +19,15 @@ namespace TarodevController {
         [SerializeField, Range(1f, 3f)] private float _maxIdleSpeed = 2;
         [SerializeField] private float _maxParticleFallSpeed = -40;
 
-        private PlayerController _player;
+        private IPlayerController _player;
         private bool _playerGrounded;
         private ParticleSystem.MinMaxGradient _currentGradient;
         private Vector2 _movement;
 
-        void Awake() => _player = FindObjectOfType<PlayerController>();
+        void Awake() => _player = GetComponentInParent<IPlayerController>();
 
         void Update() {
-            if (!_player) return;
+            if (_player == null) return;
 
             // Flip the sprite
             if (_player.Input.X != 0) transform.localScale = new Vector3(_player.Input.X > 0 ? 1 : -1, 1, 1);

@@ -10,7 +10,7 @@ namespace TarodevController {
     /// if there's enough interest. You can play and compete for best times here: https://tarodev.itch.io/
     /// If you hve any questions or would like to brag about your score, come to discord: https://discord.gg/GqeHHnhHpz
     /// </summary>
-    public class PlayerController : MonoBehaviour {
+    public class PlayerController : MonoBehaviour, IPlayerController {
         // Public for external hooks
         public Vector3 Velocity { get; private set; }
         public FrameInput Input { get; private set; }
@@ -302,10 +302,22 @@ namespace TarodevController {
             public readonly Vector2 Start, End, Dir;
         }
 
-        public struct FrameInput {
-            public float X;
-            public bool JumpDown;
-            public bool JumpUp;
-        }
+  
+    }
+    
+    public struct FrameInput {
+        public float X;
+        public bool JumpDown;
+        public bool JumpUp;
+    }
+
+    public interface IPlayerController {
+        public Vector3 Velocity { get;  }
+        public FrameInput Input { get;  }
+        public bool JumpingThisFrame { get; }
+        public bool LandingThisFrame { get; }
+        public Vector3 RawMovement { get;  }
+        public bool Grounded { get;  }
     }
 }
+
