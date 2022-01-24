@@ -8,5 +8,9 @@ Play the game: https://tarodev.itch.io/ultimate-2d-controller
 
 ### Leave a ⭐ if you found it helpful!
 
+#### User guide:<br>
+1. Create a layer for your ground and assign it to your ground and other obstacles. Set the 'Ground Layer' on the controller and animator scripts.<br>
+2. Set your controllers bounding box to match your character. <br>
+
 
 Feel free to use the code in your production games. Attribution welcomed :)
