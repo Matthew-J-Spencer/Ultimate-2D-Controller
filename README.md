@@ -1,5 +1,7 @@
 # Ultimate 2D Controller
-
+```dif
+- NOTE: If you'd prefer standard Unity physics, checkout the 'Standard-Physics' branch. Which will soon become main.
+```
 A great starting point for your 2D controller. Making use of all the hidden tricks like coyote, buffered actions, speedy apex, anti grav apex, etc
 
 Watch the video: https://www.youtube.com/watch?v=3sWTzMsmdx8 <br>
