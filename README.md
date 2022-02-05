@@ -15,3 +15,12 @@ Play the game: https://tarodev.itch.io/ultimate-2d-controller
 
 
 Feel free to use the code in your production games. Attribution welcomed :)
+
+
+## About the 'Extended' controller (Patreon)
+Converted to use standard unity physics, making it much easier to use and incorporate into your game.<br>
+It's even smoother than the current version.<br>
+Fixed a bunch of bugs.<br>
+Added dash and double jump (more planned).<br>
+And of course better support.<br>
+[Click here](https://www.patreon.com/tarodev)
