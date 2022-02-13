@@ -21,6 +21,6 @@ Feel free to use the code in your production games. Attribution welcomed :)
 Converted to use standard unity physics, making it much easier to use and incorporate into your game.<br>
 It's even smoother than the current version.<br>
 Fixed a bunch of bugs.<br>
-Added dash and double jump (more planned).<br>
+Added dash, double jump, crouch/slide (more planned).<br>
 And of course better support.<br>
 [Click here](https://www.patreon.com/tarodev)
