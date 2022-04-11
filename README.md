@@ -20,7 +20,10 @@ Feel free to use the code in your production games. Attribution welcomed :)
 ## About the 'Extended' controller (Patreon)
 Converted to use standard unity physics, making it much easier to use and incorporate into your game.<br>
 It's even smoother than the current version.<br>
+Moving platforms & one-way platforms.<br>
+External forces (explosions, sword hits, bouncy... things).<br>
+Dash, double jump, crouch/slide.<br>
+New input system support.<br>
 Fixed a bunch of bugs.<br>
-Added dash, double jump, crouch/slide (more planned).<br>
 And of course better support.<br>
 [Click here](https://www.patreon.com/tarodev)
