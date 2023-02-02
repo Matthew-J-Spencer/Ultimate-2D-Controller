@@ -10,12 +10,12 @@ namespace TarodevController {
     }
 
     public interface IPlayerController {
-        public Vector3 Velocity { get; }
-        public FrameInput Input { get; }
-        public bool JumpingThisFrame { get; }
-        public bool LandingThisFrame { get; }
-        public Vector3 RawMovement { get; }
-        public bool Grounded { get; }
+         Vector3 Velocity { get; }
+         FrameInput Input { get; }
+         bool JumpingThisFrame { get; }
+         bool LandingThisFrame { get; }
+         Vector3 RawMovement { get; }
+         bool Grounded { get; }
     }
 
     public struct RayRange {
