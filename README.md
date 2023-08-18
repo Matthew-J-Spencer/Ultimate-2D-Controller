@@ -25,6 +25,7 @@ External forces (explosions, sword hits, bouncy... things).<br>
 Dash, double jump, crouch/slide.<br>
 Slopes.<br>
 Ledge sliding, grabbing & climbing.<br>
+Tilemap Support.<br>
 New input system support.<br>
 Fixed a bunch of bugs.<br>
 And of course better support.<br>
