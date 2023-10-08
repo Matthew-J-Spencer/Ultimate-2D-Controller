@@ -7,8 +7,8 @@ namespace TarodevController
     /// Hey!
     /// Tarodev here. I built this controller as there was a severe lack of quality & free 2D controllers out there.
     /// I have a premium version on Patreon, which has every feature you'd expect from a polished controller. Link: https://www.patreon.com/tarodev
-    /// You can play and compete for best times here: https://tarodev.itch.io/
-    /// If you hve any questions or would like to brag about your score, come to discord: https://discord.gg/GqeHHnhHpz
+    /// You can play and compete for best times here: https://tarodev.itch.io/extended-ultimate-2d-controller
+    /// If you hve any questions or would like to brag about your score, come to discord: https://discord.gg/tarodev
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerController : MonoBehaviour, IPlayerController
@@ -18,7 +18,6 @@ namespace TarodevController
         private CapsuleCollider2D _col;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
-        private int _fixedFrame;
         private bool _cachedQueryStartInColliders;
 
         #region Interface
@@ -29,6 +28,8 @@ namespace TarodevController
 
         #endregion
 
+        private float _time;
+
         private void Awake()
         {
             _rb = GetComponent<Rigidbody2D>();
@@ -37,7 +38,11 @@ namespace TarodevController
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
 
-        private void Update() => GatherInput();
+        private void Update()
+        {
+            _time += Time.deltaTime;
+            GatherInput();
+        }
 
         private void GatherInput()
         {
@@ -57,29 +62,24 @@ namespace TarodevController
             if (_frameInput.JumpDown)
             {
                 _jumpToConsume = true;
-                _frameJumpWasPressed = _fixedFrame;
+                _timeJumpWasPressed = _time;
             }
         }
 
         private void FixedUpdate()
         {
-            _fixedFrame++;
-
             CheckCollisions();
 
             HandleJump();
-            HandleHorizontal();
-            HandleVertical();
+            HandleDirection();
+            HandleGravity();
+            
             ApplyMovement();
         }
 
         #region Collisions
-
-        private readonly RaycastHit2D[] _groundHits = new RaycastHit2D[1];
-        private readonly RaycastHit2D[] _ceilingHits = new RaycastHit2D[1];
-        private int _groundHitCount;
-        private int _ceilingHitCount;
-        private int _frameLeftGrounded = int.MinValue;
+        
+        private float _frameLeftGrounded = float.MinValue;
         private bool _grounded;
 
         private void CheckCollisions()
@@ -87,17 +87,14 @@ namespace TarodevController
             Physics2D.queriesStartInColliders = false;
 
             // Ground and Ceiling
-            _groundHitCount = Physics2D.CapsuleCastNonAlloc(_col.bounds.center, _col.size, _col.direction, 0, Vector2.down, _groundHits, _stats.GrounderDistance, ~_stats.PlayerLayer);
-            _ceilingHitCount = Physics2D.CapsuleCastNonAlloc(_col.bounds.center, _col.size, _col.direction, 0, Vector2.up, _ceilingHits, _stats.GrounderDistance, ~_stats.PlayerLayer);
+            bool groundHit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.down, _stats.GrounderDistance, ~_stats.PlayerLayer);
+            bool ceilingHit = Physics2D.CapsuleCast(_col.bounds.center, _col.size, _col.direction, 0, Vector2.up, _stats.GrounderDistance, ~_stats.PlayerLayer);
 
             // Hit a Ceiling
-            if (_ceilingHitCount > 0)
-            {
-                _frameVelocity.y = Mathf.Min(0, _frameVelocity.y);
-            }
+            if (ceilingHit) _frameVelocity.y = Mathf.Min(0, _frameVelocity.y);
 
             // Landed on the Ground
-            if (!_grounded && _groundHitCount > 0)
+            if (!_grounded && groundHit)
             {
                 _grounded = true;
                 _coyoteUsable = true;
@@ -106,13 +103,13 @@ namespace TarodevController
                 GroundedChanged?.Invoke(true, Mathf.Abs(_frameVelocity.y));
             }
             // Left the Ground
-            else if (_grounded && _groundHitCount == 0)
+            else if (_grounded && !groundHit)
             {
                 _grounded = false;
-                _frameLeftGrounded = _fixedFrame;
+                _frameLeftGrounded = _time;
                 GroundedChanged?.Invoke(false, 0);
             }
-            
+
             Physics2D.queriesStartInColliders = _cachedQueryStartInColliders;
         }
 
@@ -125,10 +122,10 @@ namespace TarodevController
         private bool _bufferedJumpUsable;
         private bool _endedJumpEarly;
         private bool _coyoteUsable;
-        private int _frameJumpWasPressed;
+        private float _timeJumpWasPressed;
 
-        private bool HasBufferedJump => _bufferedJumpUsable && _fixedFrame < _frameJumpWasPressed + _stats.JumpBufferFrames;
-        private bool CanUseCoyote => _coyoteUsable && !_grounded && _fixedFrame < _frameLeftGrounded + _stats.CoyoteFrames;
+        private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
+        private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
 
         private void HandleJump()
         {
@@ -144,7 +141,7 @@ namespace TarodevController
         private void ExecuteJump()
         {
             _endedJumpEarly = false;
-            _frameJumpWasPressed = 0;
+            _timeJumpWasPressed = 0;
             _bufferedJumpUsable = false;
             _coyoteUsable = false;
             _frameVelocity.y = _stats.JumpPower;
@@ -155,7 +152,7 @@ namespace TarodevController
 
         #region Horizontal
 
-        private void HandleHorizontal()
+        private void HandleDirection()
         {
             if (_frameInput.Move.x == 0)
             {
@@ -170,9 +167,9 @@ namespace TarodevController
 
         #endregion
 
-        #region Vertical
+        #region Gravity
 
-        private void HandleVertical()
+        private void HandleGravity()
         {
             if (_grounded && _frameVelocity.y <= 0f)
             {
@@ -188,10 +185,7 @@ namespace TarodevController
 
         #endregion
 
-        private void ApplyMovement()
-        {
-            _rb.velocity = _frameVelocity;
-        }
+        private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
 #if UNITY_EDITOR
         private void OnValidate()

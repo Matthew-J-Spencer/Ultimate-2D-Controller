@@ -30,7 +30,6 @@ namespace TarodevController
         private IPlayerController _player;
         private bool _grounded;
         private ParticleSystem.MinMaxGradient _currentGradient;
-        private readonly RaycastHit2D[] _groundHits = new RaycastHit2D[1];
 
         private void Awake()
         {
@@ -42,7 +41,7 @@ namespace TarodevController
         {
             _player.Jumped += OnJumped;
             _player.GroundedChanged += OnGroundedChanged;
-            
+
             _moveParticles.Play();
         }
 
@@ -50,7 +49,7 @@ namespace TarodevController
         {
             _player.Jumped -= OnJumped;
             _player.GroundedChanged -= OnGroundedChanged;
-            
+
             _moveParticles.Stop();
         }
 
@@ -58,60 +57,61 @@ namespace TarodevController
         {
             if (_player == null) return;
 
-            var xInput = _player.FrameInput.x;
-
             DetectGroundColor();
 
-            HandleSpriteFlip(xInput);
+            HandleSpriteFlip();
 
-            HandleIdleSpeed(xInput);
+            HandleIdleSpeed();
 
-            HandleCharacterTilt(xInput);
+            HandleCharacterTilt();
         }
 
-        private void HandleSpriteFlip(float xInput)
+        private void HandleSpriteFlip()
         {
-            if (_player.FrameInput.x != 0) _sprite.flipX = xInput < 0;
+            if (_player.FrameInput.x != 0) _sprite.flipX = _player.FrameInput.x < 0;
         }
 
-        private void HandleIdleSpeed(float xInput)
+        private void HandleIdleSpeed()
         {
-            var inputStrength = Mathf.Abs(xInput);
+            var inputStrength = Mathf.Abs(_player.FrameInput.x);
             _anim.SetFloat(IdleSpeedKey, Mathf.Lerp(1, _maxIdleSpeed, inputStrength));
             _moveParticles.transform.localScale = Vector3.MoveTowards(_moveParticles.transform.localScale, Vector3.one * inputStrength, 2 * Time.deltaTime);
         }
 
-        private void HandleCharacterTilt(float xInput)
+        private void HandleCharacterTilt()
         {
-            var runningTilt = _grounded ? Quaternion.Euler(0, 0, _maxTilt * xInput) : Quaternion.identity;
+            var runningTilt = _grounded ? Quaternion.Euler(0, 0, _maxTilt * _player.FrameInput.x) : Quaternion.identity;
             _anim.transform.up = Vector3.RotateTowards(_anim.transform.up, runningTilt * Vector2.up, _tiltSpeed * Time.deltaTime, 0f);
         }
-        
+
         private void OnJumped()
         {
             _anim.SetTrigger(JumpKey);
             _anim.ResetTrigger(GroundedKey);
 
-            // Avoid coyote
-            if (_grounded)
+
+            if (_grounded) // Avoid coyote
             {
                 SetColor(_jumpParticles);
                 SetColor(_launchParticles);
                 _jumpParticles.Play();
             }
         }
-        
+
         private void OnGroundedChanged(bool grounded, float impact)
         {
             _grounded = grounded;
+            
             if (grounded)
             {
+                DetectGroundColor();
+                SetColor(_landParticles);
+
                 _anim.SetTrigger(GroundedKey);
                 _source.PlayOneShot(_footsteps[Random.Range(0, _footsteps.Length)]);
                 _moveParticles.Play();
 
                 _landParticles.transform.localScale = Vector3.one * Mathf.InverseLerp(0, 40, impact);
-                SetColor(_landParticles);
                 _landParticles.Play();
             }
             else
@@ -119,20 +119,15 @@ namespace TarodevController
                 _moveParticles.Stop();
             }
         }
-        
+
         private void DetectGroundColor()
         {
-            var groundHitCount = Physics2D.RaycastNonAlloc(transform.position, Vector3.down, _groundHits, 2);
+            var hit = Physics2D.Raycast(transform.position, Vector3.down, 2);
 
-            for (var i = 0; i < groundHitCount; i++)
-            {
-                var hit = _groundHits[i];
-                if (!hit || hit.collider.isTrigger || !hit.transform.TryGetComponent(out SpriteRenderer r)) continue;
-                var color = r.color;
-                _currentGradient = new ParticleSystem.MinMaxGradient(color * 0.9f, color * 1.2f);
-                SetColor(_moveParticles);
-                return;
-            }
+            if (!hit || hit.collider.isTrigger || !hit.transform.TryGetComponent(out SpriteRenderer r)) return;
+            var color = r.color;
+            _currentGradient = new ParticleSystem.MinMaxGradient(color * 0.9f, color * 1.2f);
+            SetColor(_moveParticles);
         }
 
         private void SetColor(ParticleSystem ps)

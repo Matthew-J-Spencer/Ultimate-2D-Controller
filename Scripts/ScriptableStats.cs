@@ -47,10 +47,10 @@ namespace TarodevController
         [Tooltip("The gravity multiplier added when jump is released early")]
         public float JumpEndEarlyGravityModifier = 3;
 
-        [Tooltip("The fixed frames before coyote jump becomes unusable. Coyote jump allows jump to execute even after leaving a ledge")]
-        public int CoyoteFrames = 7;
+        [Tooltip("The time before coyote jump becomes unusable. Coyote jump allows jump to execute even after leaving a ledge")]
+        public float CoyoteTime = .15f;
 
-        [Tooltip("The amount of fixed frames we buffer a jump. This allows jump input before actually hitting the ground")]
-        public int JumpBufferFrames = 7;
+        [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
+        public float JumpBuffer = .2f;
     }
 }
